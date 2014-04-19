@@ -5,7 +5,7 @@ This is a TAS (tool-assisted speedrun) or Lua scripting project created by [goch
 <https://github.com/gocha/gocha-tas>
 
 You can explore the contents by GitHub's file viewer.
-You can also download whole repository just by clicking "Download ZIP" link.
+You can also download whole repository just by clicking "[Download ZIP](https://github.com/gocha/gocha-tas/archive/master.zip)" link.
 
 If you are looking for old files before 2014,
 visit [Google Code page](https://code.google.com/p/gocha-tas/).
@@ -16,7 +16,7 @@ visit [Google Code page](https://code.google.com/p/gocha-tas/).
 TASやスクリプトを置いているプロジェクトです。
 
 GitHub のファイルビューアでリポジトリ内を観覧できます。
-また、「Download ZIP」のリンクで一括ダウンロードが可能ですので、
+また、「[Download ZIP](https://github.com/gocha/gocha-tas/archive/master.zip)」のリンクで一括ダウンロードが可能ですので、
 気軽にご利用ください。
 
 2013年以前の古いファイルは [Google Code page](https://code.google.com/p/gocha-tas/) にあります。
