@@ -1,0 +1,21 @@
+
+19
+00000	02110670	d	h	0	X position (next)
+00001	02110674	d	h	0	Y position (next)
+00002	0211067C	d	s	0	X velocity
+00003	02110680	d	s	0	Y velocity
+00004	02107190	d	u	0	Ingame frame
+00005	021070D0	w	u	0	Current HP value
+00006	021070D2	w	u	0	Max HP value
+00007	021070D4	w	u	0	Current MP value
+00008	021070D6	w	u	0	Max MP value
+00009	021070D8	w	u	0	Current heart count
+0000A	021070DA	w	u	0	Max heart count
+0000B	02110705	b	u	0	Invinsibility
+0000C	0212FA4e	w	h	0	Shanoa's hitbox left
+0000D	0212FA50	w	h	0	Shanoa's hitbox top
+0000E	0212FA52	w	h	0	Shanoa's hitbox right
+0000F	0212FA54	w	h	0	Shanoa's hitbox bottom
+00010	0213F7E0	d	h	0	Random Number
+00011	02110778	d	s	0	Magnes X velocity
+00012	0211077C	d	s	0	Magnes Y velocity

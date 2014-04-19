@@ -1,0 +1,27 @@
+
+25
+00000	02109850	d	h	0	X position (next)
+00001	02109854	d	h	0	Y position (next)
+00002	0210985C	d	s	0	X velocity (basic)
+00003	02109860	d	s	0	Y velocity (basic)
+00004	02109868	d	s	0	Deceleration
+00005	02100374	d	u	0	Ingame frame
+00006	021002B4	w	u	0	Current HP value
+00007	021002B6	w	u	0	Max HP value
+00008	021002B8	w	u	0	Current MP value
+00009	021002BA	w	u	0	Max MP value
+0000A	021002BC	w	u	0	Current heart count
+0000B	021002BE	w	u	0	Max heart count
+0000C	021098E5	b	u	0	Invinsibility
+0000D	02128C2E	w	h	0	Shanoa's hitbox left
+0000E	02128C30	w	h	0	Shanoa's hitbox top
+0000F	02128C32	w	h	0	Shanoa's hitbox right
+00010	02128C34	w	h	0	Shanoa's hitbox bottom
+00011	021389C0	d	h	0	Random Number
+00012	020FFF50	d	s	0	Magnes X velocity
+00013	020FFF54	d	s	0	Magnes Y Velocity
+00014	02109958	d	s	0	Total X velocity
+00015	0210995C	d	s	0	Total Y velocity
+00016	02109932	b	u	0	Double jump
+00017	0210983A	w	u	0	Glyph Absorb #1
+00018	0210983C	w	u	0	Glyph Absorb #2

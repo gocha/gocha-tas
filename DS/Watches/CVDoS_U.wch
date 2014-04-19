@@ -1,0 +1,28 @@
+
+26
+00000	020CAA40	d	h	0	X position
+00001	020CAA44	d	h	0	Y position
+00002	020CA95C	d	h	0	X position (next)
+00003	020CA960	d	h	0	Y position (next)
+00004	020CA968	w	s	0	X velocity
+00005	020CA96C	w	s	0	Y velocity
+00006	020C07E4	d	h	0	Random number
+00007	020F703C	d	u	0	Ingame frame
+00008	020CA9F3	b	u	0	Soma invulnerability 1
+00009	020CAA24	b	u	0	Soma invulnerability 2
+0000A	020F7410	w	u	0	Current HP value
+0000B	020F7412	w	u	0	Max HP value
+0000C	020F7414	w	u	0	Current MP value
+0000D	020F7416	w	u	0	Max MP value 
+0000E	020F7448	d	u	0	Current EXP value
+0000F	020F2A88	b	u	0	Magic Seal Step
+00010	020F2A8C	b	u	0	Magical Seal Substep
+00011	020CED88	d	u	0	Succubus timer
+00012	020F7018	d	h	0	X position for Suspend
+00013	020F701C	d	h	0	Y position for Suspend
+00014	020F7256	w	h	0	Pause/Suspend Lock
+00015	020F7259	b	u	0	Hard Mode
+00016	020F718A	b	h	0	Menace flags
+00017	020F7187	b	h	0	"Warp Room" Message
+00018	020F71A8	w	h	0	Warp Rooms Activated
+00019	020CEDA0	d	h	0	Skull Y position

@@ -1,0 +1,27 @@
+
+25
+00000	020F627C	d	h	0	RNG
+00001	020F6274	d	h	0	RNG #2
+00002	020F6270	d	u	0	Count for RNG
+00003	021121C0	d	u	0	Total Exp.
+00004	021119E0	d	u	0	Ingame time
+00005	020FCAB0	d	h	0	Jonathan X position (next)
+00006	020FCAB4	d	h	0	Jonathan Y position (next)
+00007	020FCABC	d	s	0	Jonathan X speed
+00008	020FCAC0	d	s	0	Jonathan Y speed
+00009	020FCC10	d	h	0	Charotte X position (next)
+0000A	020FCC14	d	h	0	Charotte Y position (next)
+0000B	020FCC1C	d	s	0	Charotte X speed
+0000C	020FCC20	d	s	0	Charotte Y speed
+0000D	020FCB45	b	u	0	Jonathan invulnerability
+0000E	020FCCA5	b	u	0	Charotte invulnerability
+0000F	021115FC	d	u	0	Change Cube cooldown
+00010	0211177C	w	u	0	Room position X for Suspend
+00011	02111780	w	u	0	Room position Y for Suspend
+00012	021119BC	d	h	0	X position for Suspend
+00013	021119C0	d	h	0	Y position for Suspend
+00014	020FCB8E	b	u	0	Jonathan Jump Count
+00015	020FCCEE	b	u	0	Charlotte Jump Count
+00016	020FCCCA	w	u	0	Spell-casting timer
+00017	020FCB91	b	u	0	Jonathan fast partner switching timer
+00018	020FCCF1	b	u	0	Charlotte fast partner switching timer
