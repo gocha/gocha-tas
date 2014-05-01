@@ -1,11 +1,15 @@
 -- Lua: Override tostring() and provide pretty print for table.
 -- This implementation is nearly close to what DeSmuME does.
 
+-- do nothing if it's already prettified
+if string.match(tostring({}), "{") then
+  return nil
+end
+
 local __PrettyToString = {}
 
 __PrettyToString = {
   tostring = tostring;
-  table_pretiffied = string.match(tostring({}), "{");
 
   -- Return if given table is an array, not hash.
   -- An array which includes nil will be treated as a hash.
@@ -75,7 +79,7 @@ __PrettyToString = {
 }
 
 function tostring(e)
-  if type(e) == "table" and not __PrettyToString.table_pretiffied then
+  if type(e) == "table" then
     return __PrettyToString.pretty_tostring(e)
   else
     return __PrettyToString.tostring(e)
