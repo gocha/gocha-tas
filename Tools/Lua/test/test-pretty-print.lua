@@ -13,6 +13,7 @@ local t = {{
 }} -- nested table
 
 print("print\n")
+print(tostring(t))
 print(t)
 print("aaa", "bbb", "ccc")
 print("--------------------\n")
