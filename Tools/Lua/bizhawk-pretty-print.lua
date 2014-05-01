@@ -12,6 +12,7 @@ __BizHawkConsoleToString = {
   console_write = console.write;
   console_writeline = console.writeline;
   console_log = console.log;
+  console_output = console.output;
   print = print;
 
   tostringall = function(...)
@@ -38,6 +39,12 @@ end
 if __BizHawkConsoleToString.console_log then
   function console.log(...)
     return __BizHawkConsoleToString.console_log(__BizHawkConsoleToString.tostringall(...))
+  end
+end
+
+if __BizHawkConsoleToString.console_output then
+  function console.output(...)
+    return __BizHawkConsoleToString.console_output(__BizHawkConsoleToString.tostringall(...))
   end
 end
 
