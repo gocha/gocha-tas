@@ -52,7 +52,7 @@ __PrettyToString = {
           if not skip_key then
             local key_pre, key_post = "", ""
             if type(k) == "string" then
-              if not string.match(k, "^[A-Za-z_]") then
+              if not string.match(k, "^[A-Za-z_][0-9A-Za-z_]*$") then
                 key_pre, key_post = '["', '"]'
               end
             else
