@@ -3,15 +3,15 @@
 -- require 'pretty-tostring'
 require 'bizhawk-pretty-print'
 
--- {{[true]=false, [1]={100, 200}, ["!?"]="symbol", [{1, 2}]="table", testfunc=function: 00123ABC}}
+-- {{[true]=false, [1]={100, 200}, ["!?"]="symbol", [{1, 2}]="table", testfunc=function: 00123ABC},222,333,444}
 local t = {{
   ["!?"] = "symbol";
   [1] = { 100, 200 };
   [{1, 2}] = "table";
   testfunc = tonumber;
   [true] = false;
-}} -- nested table
-t[t] = t -- recursive reference
+}, 222, 333, 444} -- nested table
+t[1][t] = t -- recursive reference
 
 print("print\n")
 print(tostring(t))
