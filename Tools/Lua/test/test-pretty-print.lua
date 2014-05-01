@@ -11,6 +11,7 @@ local t = {{
   testfunc = tonumber;
   [true] = false;
 }} -- nested table
+t[t] = t -- recursive reference
 
 print("print\n")
 print(tostring(t))
