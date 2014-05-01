@@ -1,3 +1,4 @@
+--- PCKeyState: User hotkey module for BizHawk.
 
 -- See the following page to know OOP in Lua.
 -- http://lua-users.org/wiki/ObjectOrientationTutorial
