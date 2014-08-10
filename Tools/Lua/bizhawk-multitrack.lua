@@ -168,7 +168,7 @@ for i, hotkey in ipairs(hotkeys) do
 end
 
 -- frame-based procedure
-event.onframeend(function()
+event.onframestart(function()
   multi_track:input()
 end)
 
