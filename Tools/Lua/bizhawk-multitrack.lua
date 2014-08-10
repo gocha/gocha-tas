@@ -24,7 +24,7 @@ end
 
 --- Clear captured input.
 -- @param self MultiTrackLight object.
-function MultiTrackLight.clear(self)
+function MultiTrackLight:clear()
   self.captured_inputs = {}
 end
 
@@ -32,7 +32,7 @@ end
 -- @param self MultiTrackLight object.
 -- @param start_frame Start frame of capture.
 -- @param end_frame End frame of capture.
-function MultiTrackLight.capture(self, ...)
+function MultiTrackLight:capture(...)
   local args = {...}
   local start_frame = args[1] or (emu.framecount() - self.capture_range)
   local end_frame = args[2] or (emu.framecount() + self.capture_range)
@@ -69,7 +69,7 @@ end
 
 --- Input from existing capture.
 -- @param self MultiTrackLight object.
-function MultiTrackLight.input(self)
+function MultiTrackLight:input()
   -- movie playback should not be overridden.
   if movie.mode() == "PLAY" then
     return
@@ -101,23 +101,30 @@ function MultiTrackLight.input(self)
         player = 1
       end
 
-      -- toggle input if allowed
-      if self.override_input[player] and captured_input[key] then
-    print(tostring(frame) .. "|" .. tostring(player) .. "|" .. tostring(key) .. "|" .. tostring(not pressed))
-        keys[key] = not pressed
+      -- override input if requested
+      if self.override_input[player] then
+        if captured_input[key] then
+          print(tostring(frame) .. "|" .. tostring(player) .. "|" .. tostring(key) .. "|" .. tostring(not pressed))
+          keys[key] = true
+        else
+          keys[key] = false
+        end
+      else
+        -- use user input
+        keys[key] = nil
       end
     end
-  end
 
-  -- set input back
-  joypad.set(keys)
+    -- set input back
+    joypad.set(keys)
+  end
 end
 
 --- Check if input is enabled for specified player.
 -- @param self MultiTrackLight object.
 -- @param player Player number.
 -- @return true if tracker input is enabled.
-function MultiTrackLight.is_active(self, player)
+function MultiTrackLight:is_active(player)
   player = player or 1
   if self.override_input[player] then
     return true
@@ -130,7 +137,7 @@ end
 -- @param self MultiTrackLight object.
 -- @param player Player number.
 -- @param status Switch to enable/disable input. (true of false)
-function MultiTrackLight.active(self, player, status)
+function MultiTrackLight:active(player, status)
   player = player or 1
   self.override_input[player] = status
 end
@@ -161,7 +168,7 @@ for i, hotkey in ipairs(hotkeys) do
 end
 
 -- frame-based procedure
-event.onframestart(function()
+event.onframeend(function()
   multi_track:input()
 end)
 
