@@ -104,7 +104,7 @@ function MultiTrackLight:input()
       -- override input if requested
       if self.override_input[player] then
         if captured_input[key] then
-          print(tostring(frame) .. "|" .. tostring(player) .. "|" .. tostring(key) .. "|" .. tostring(not pressed))
+          -- print(tostring(frame) .. "|" .. tostring(player) .. "|" .. tostring(key) .. "|" .. tostring(not pressed))
           keys[key] = true
         else
           keys[key] = false
