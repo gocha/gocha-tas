@@ -5,7 +5,8 @@ function number_to_bcd(n)
 end
 
 function bcd_to_number(n)
-  return tonumber(string.format("%x", n), 10)
+  local num = tonumber(string.format("%x", n), 10)
+  return num or 0
 end
 
 function shallow_copy(orig)
@@ -124,6 +125,15 @@ function Goemon3SimpleHUD:fetch()
   self.platform_screen = (mainmemory.readbyte(0x00a4) ~= 0)
   self.fade_level = math.min(mainmemory.readbyte(0x1fa0) / 15.0, 1.0)
 
+  self.ingame = {}
+  self.ingame.hours = bcd_to_number(memory.readbyte(0x08ef))
+  self.ingame.minutes = bcd_to_number(memory.readbyte(0x08ee))
+  self.ingame.seconds = memory.readbyte(0x08f1)
+  self.ingame.frames = memory.readbyte(0x08f0)
+  self.ingame.subseconds = (self.ingame.frames / 60)
+  self.ingame.readable = ((self.ingame.hours == 0) and "" or string.format("%d:", self.ingame.hours)) ..
+    string.format("%02d:%05.2f", self.ingame.minutes, self.ingame.seconds + self.ingame.subseconds)
+
   self.room_transition = (mainmemory.read_u16_le(0x0076) ~= 0)
   self.random = mainmemory.read_u16_le(0x0086)
   self.room = mainmemory.read_u16_le(0x008e)
@@ -211,9 +221,11 @@ function Goemon3SimpleHUD:render_player_status()
   local font_height = 16
   local status_message
 
+  status_message = self.ingame.readable
+
   if self.platform_screen then
     if self.game_state == self.GAME_STATE_OVERWORLD or self.game_state == self.GAME_STATE_PLATFORM then
-      status_message = string.format("ROOM:%03X", self.room)
+      status_message = status_message .. string.format(" ROOM:%03X", self.room)
       if self.walker_jump ~= 0 then
         status_message = status_message .. string.format(" WJ:%d", self.walker_jump)
       end
@@ -276,7 +288,7 @@ function Goemon3SimpleHUD:render_player_status()
         meter = meter + ((3 - (self.framecount % 4)) / 4.0)
       end
 
-      status_message = string.format("%.2fM", meter)
+      status_message = string.format(" %.2fM", meter)
       if self.chase_finish_cooldown > 0 then
         status_message = status_message .. string.format(" %d", self.chase_finish_cooldown)
       end
@@ -284,7 +296,7 @@ function Goemon3SimpleHUD:render_player_status()
       gui.text(hud_x, hud_y, status_message)
       hud_y = hud_y + font_height
     elseif self.game_state == self.GAME_STATE_IMPACT_MARCH then
-      status_message = string.format("EN%d D%d", self.impact.health, math.floor(self.camera_x / 256))
+      status_message = string.format(" EN%d D%d", self.impact.health, math.floor(self.camera_x / 256))
       if self.impact.cooldown_for_step ~= 0 then
         status_message = status_message .. string.format(" W%d", self.impact.cooldown_for_step)
       end
@@ -299,7 +311,7 @@ function Goemon3SimpleHUD:render_player_status()
     end
   else
     if self.game_state == self.GAME_STATE_IMPACT_BOSS then
-      status_message = string.format("EN%d", self.impact.health)
+      status_message = string.format(" EN%d", self.impact.health)
       if self.impact.charge_for_koban ~= 0 then
         status_message = status_message .. string.format(" K%d", self.impact.charge_for_koban)
       end
@@ -312,6 +324,8 @@ function Goemon3SimpleHUD:render_player_status()
 
       gui.text(hud_x, hud_y, status_message)
       hud_y = hud_y + font_height
+    else
+      gui.text(hud_x, hud_y, status_message)
     end
   end
 end
