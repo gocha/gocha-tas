@@ -38,6 +38,23 @@ function deep_copy(orig)
   return copy
 end
 
+function gui.color(r, g, b, a)
+  if not a then
+    a = 255
+  end
+
+  r = math.floor(r)
+  g = math.floor(g)
+  b = math.floor(b)
+  a = math.floor(a)
+
+  if a > 127 then
+    return (r * 65536 + g * 256 + b) - ((256 - a) * 16777216)
+  else
+    return a * 16777216 + r * 65536 + g * 256 + b
+  end
+end
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 local Goemon3SimpleHUD = {}
@@ -103,6 +120,11 @@ function Goemon3SimpleHUD.new()
   self.GAME_STATE_CHASE = 2
   self.GAME_STATE_IMPACT_MARCH = 3
   self.GAME_STATE_IMPACT_BOSS = 4
+
+  self.MAX_PLAYERS = 2
+  self.MAX_SPRITES = 64
+
+  self.show_hitbox = true
   return self
 end
 
@@ -154,12 +176,14 @@ function Goemon3SimpleHUD:fetch()
   self.door_hit_status = mainmemory.read_u16_le(0x197e)
 
   self.players = self.players or {}
-  for player_index = 0, 1 do
+  for player_index = 0, self.MAX_PLAYERS - 1 do
     local base_address = 0x0400 + (player_index * 0xc0)
     local player = {}
 
-    player.x = self.camera_x + mainmemory.read_u16_le(base_address + 0x08)
-    player.y = self.camera_y + mainmemory.read_u16_le(base_address + 0x0c)
+    player.x_relative = mainmemory.read_u16_le(base_address + 0x08)
+    player.y_relative = mainmemory.read_u16_le(base_address + 0x0c)
+    player.x = self.camera_x + player.x_relative
+    player.y = self.camera_y + player.y_relative
     player.z = mainmemory.read_s16_le(base_address + 0x10)
     if not self.players[player_index + 1] then
       player.velocity_x = mainmemory.read_s16_le(base_address + 0x26) -- does not work in overworld
@@ -175,6 +199,15 @@ function Goemon3SimpleHUD:fetch()
     player.return_x = self.camera_x + player.return_x_relative
     player.return_y = self.camera_y + player.return_y_relative
 
+    player.hitbox = {}
+    player.hitbox.width = mainmemory.read_u16_le(base_address + 0x2e)
+    player.hitbox.height = mainmemory.read_u16_le(base_address + 0x30)
+    player.hitbox.px_left = bit.rshift(player.x_relative, 8) - player.hitbox.width
+    player.hitbox.px_right = bit.rshift(player.x_relative, 8) + player.hitbox.width
+    player.hitbox.px_top = bit.rshift(player.y_relative, 8) - player.hitbox.height
+    player.hitbox.px_bottom = bit.rshift(player.y_relative, 8)
+    player.hitbox.width = player.hitbox.width * 2
+
     player.cooldown_for_mermaid_rush = mainmemory.readbyte(base_address + 0x2c)
     player.invulnerable = (mainmemory.readbyte(base_address + 0x38) >= 0x80)
     player.charge_for_pushing = mainmemory.read_s16_le(base_address + 0x44)
@@ -187,6 +220,47 @@ function Goemon3SimpleHUD:fetch()
     player.charge_for_falldown_y = mainmemory.readbyte(base_address + 0xbd)
 
     self.players[player_index + 1] = player
+  end
+
+  self.sprites = {}
+  for sprite_index = 0, self.MAX_SPRITES do
+    local base_address = 0x0300 + (sprite_index * 0x50)
+    local sprite = {}
+
+    sprite.available = (mainmemory.read_u16_le(base_address) ~= 0)
+    sprite.atrributes = {}
+    sprite.atrributes.bits = mainmemory.readbyte(base_address + 0x04)
+    sprite.x_relative = mainmemory.read_s32_le(base_address + 0x08)
+    sprite.y_relative = mainmemory.read_s32_le(base_address + 0x0c)
+    sprite.z = mainmemory.read_s32_le(base_address + 0x10)
+    sprite.flag1 = mainmemory.readbyte(base_address + 0x14) -- size of shadow etc
+    sprite.shadow_offset = mainmemory.read_s8(base_address + 0x15)
+    sprite.character_id = mainmemory.read_u16_le(base_address + 0x18)
+    sprite.next_sprite_address = mainmemory.read_u16_le(base_address + 0x16)
+    sprite.action = mainmemory.read_u16_le(base_address + 0x1a)
+    sprite.timer =  mainmemory.read_u16_le(base_address + 0x20)
+    sprite.velocity_x = mainmemory.read_s16_le(base_address + 0x26)
+    sprite.velocity_y = mainmemory.read_s16_le(base_address + 0x28)
+    sprite.velocity_z = mainmemory.read_s16_le(base_address + 0x2a)
+    sprite.hitbox = {}
+    sprite.hitbox.width = mainmemory.read_u16_le(base_address + 0x2e)
+    sprite.hitbox.height = mainmemory.read_u16_le(base_address + 0x30)
+    sprite.hitbox.px_left = bit.rshift(sprite.x_relative, 8) - sprite.hitbox.width
+    sprite.hitbox.px_right = bit.rshift(sprite.x_relative, 8) + sprite.hitbox.width
+    sprite.hitbox.px_top = bit.rshift(sprite.y_relative, 8) - sprite.hitbox.height
+    sprite.hitbox.px_bottom = bit.rshift(sprite.y_relative, 8)
+    sprite.hitbox.width = sprite.hitbox.width * 2
+    sprite.hitbox.attributes = mainmemory.read_u16_le(base_address + 0x34)
+    sprite.health = mainmemory.readbyte(base_address + 0x36)
+
+    -- workaround for invalid sprites
+    if sprite.hitbox.width < 0 or sprite.hitbox.height < 0 or sprite.hitbox.width > 32 or sprite.hitbox.height > 64 then
+      sprite.available = false
+    elseif sprite.health == 0 then
+      sprite.available = false
+    end
+
+    self.sprites[sprite_index + 1] = sprite
   end
 
   self.impact = self.impact or {}
@@ -221,8 +295,27 @@ function Goemon3SimpleHUD:render_player_status()
   local font_height = 16
   local status_message
 
-  status_message = self.ingame.readable
+  -- hitboxes
+  if self.show_hitbox then
+    if self.platform_screen then
+      for player_index = 0, self.MAX_PLAYERS - 1 do
+        local player = self.players[player_index + 1]
+        gui.drawRectangle(player.hitbox.px_left, player.hitbox.px_top, player.hitbox.width, player.hitbox.height, gui.color(255, 255, 255, self.fade_level * 173))
+      end
 
+      for sprite_index = 0, self.MAX_SPRITES do
+        local sprite = self.sprites[sprite_index + 1]
+        if sprite.available then
+          if (sprite.hitbox.px_left + sprite.hitbox.width) < 256 and (sprite.hitbox.px_top + sprite.hitbox.height) < 224 then
+            gui.drawRectangle(sprite.hitbox.px_left, sprite.hitbox.px_top, sprite.hitbox.width, sprite.hitbox.height, gui.color(255, 0, 0, self.fade_level * 173))
+          end
+        end
+      end
+    end
+  end
+
+  -- messages
+  status_message = self.ingame.readable
   if self.platform_screen then
     if self.game_state == self.GAME_STATE_OVERWORLD or self.game_state == self.GAME_STATE_PLATFORM then
       status_message = status_message .. string.format(" ROOM:%03X", self.room)
@@ -239,7 +332,7 @@ function Goemon3SimpleHUD:render_player_status()
       gui.text(hud_x, hud_y, status_message)
       hud_y = hud_y + font_height
 
-      for player_index = 0, 1 do
+      for player_index = 0, self.MAX_PLAYERS - 1 do
         status_message = string.format("%dP:", player_index + 1)
         local player = self.players[player_index + 1]
 
