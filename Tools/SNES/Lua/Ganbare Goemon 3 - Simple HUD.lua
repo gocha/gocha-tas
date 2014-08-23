@@ -38,6 +38,16 @@ function deep_copy(orig)
   return copy
 end
 
+function note_name(note_number)
+  local names = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" }
+  note_number = math.floor(note_number)
+  if note_number >= 0 then
+    return string.format("%-2s%d", names[1 + (note_number % 12)], note_number / 12)
+  else
+    return string.format("%d", note_number)
+  end
+end
+
 function gui.color(r, g, b, a)
   if not a then
     a = 255
@@ -123,8 +133,10 @@ function Goemon3SimpleHUD.new()
 
   self.MAX_PLAYERS = 2
   self.MAX_SPRITES = 64
+  self.MAX_SOUND_CHANNELS = 8
 
   self.show_hitbox = true
+  self.show_sound = true
   return self
 end
 
@@ -287,6 +299,18 @@ function Goemon3SimpleHUD:fetch()
 
   self.walker_jump = mainmemory.readbyte(0x042c)
 
+  -- sound
+  memory.usememorydomain("APURAM")
+  self.sound = { channels = {} }
+  for sound_channel = 0, self.MAX_SOUND_CHANNELS - 1 do
+    local channel = {}
+    channel.address = memory.read_u16_le(0x30 + sound_channel * 2)
+    channel.delta_time = memory.readbyte(0x60 + sound_channel * 2)
+    channel.available = (memory.readbyte(0xd0 + sound_channel * 2) ~= 0)
+    channel.note_number = memory.read_u16_le(0xe0 + sound_channel * 2) / 256.0
+    self.sound.channels[sound_channel] = channel
+  end
+
   memory.usememorydomain(saved_memory_domain)
 end
 
@@ -419,6 +443,19 @@ function Goemon3SimpleHUD:render_player_status()
       hud_y = hud_y + font_height
     else
       gui.text(hud_x, hud_y, status_message)
+    end
+  end
+
+  -- sound
+  if self.show_sound then
+    hud_x, hud_y = 180, 80
+    for sound_channel = 0, self.MAX_SOUND_CHANNELS - 1 do
+      local channel = self.sound.channels[sound_channel]
+      if channel.available then
+        status_message = string.format("%d:%04X %s %d", sound_channel, channel.address, note_name(channel.note_number), channel.delta_time)
+        gui.text(hud_x * client.getwindowsize(), hud_y, status_message)
+        hud_y = hud_y + font_height
+      end
     end
   end
 end
