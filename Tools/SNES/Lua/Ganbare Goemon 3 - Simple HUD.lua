@@ -381,7 +381,7 @@ function Goemon3SimpleHUD:render_player_status()
         meter = meter + ((3 - (self.framecount % 4)) / 4.0)
       end
 
-      status_message = string.format(" %.2fM", meter)
+      status_message = status_message .. string.format(" %.2fM", meter)
       if self.chase_finish_cooldown > 0 then
         status_message = status_message .. string.format(" %d", self.chase_finish_cooldown)
       end
@@ -404,7 +404,7 @@ function Goemon3SimpleHUD:render_player_status()
     end
   else
     if self.game_state == self.GAME_STATE_IMPACT_BOSS then
-      status_message = string.format(" EN%d", self.impact.health)
+      status_message = status_message .. string.format(" EN%d", self.impact.health)
       if self.impact.charge_for_koban ~= 0 then
         status_message = status_message .. string.format(" K%d", self.impact.charge_for_koban)
       end
