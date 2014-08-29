@@ -1,4 +1,4 @@
--- Ganbare Goemon 3 (J) Simple Memory Display for TAS work
+-- Ganbare Goemon 3 (J) Head-Up Display for TASing
 
 function number_to_bcd(n)
   return tonumber(tostring(n), 16)
