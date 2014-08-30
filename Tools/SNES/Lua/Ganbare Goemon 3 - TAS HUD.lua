@@ -135,8 +135,10 @@ function Goemon3SimpleHUD.new()
   self.MAX_SPRITES = 64
   self.MAX_SOUND_CHANNELS = 8
 
+  self.show_player_status = true
   self.show_hitbox = true
   self.show_sound = true
+  self.show_fireworks = true
   return self
 end
 
@@ -277,6 +279,53 @@ function Goemon3SimpleHUD:fetch()
     self.sprites[sprite_index + 1] = sprite
   end
 
+  -- some other platformer variables
+  self.walker_jump = mainmemory.readbyte(0x042c)
+
+  -- fireworks in Omatsurimura
+  if self.room == 0x0170 then
+    self.fireworks = {}
+    self.fireworks.count = mainmemory.readbyte(0x0cae)
+    self.fireworks.ignited_count = mainmemory.readbyte(0x0c9a)
+    self.fireworks.list = {}
+
+    if self.fireworks.count > 0 then
+      -- fetch the ignition order and positions of fireworks
+      for firework_index = 0, self.fireworks.count - 1 do
+        local base_address = 0x0ca0 + (firework_index * 0x50)
+        local ignition_index = mainmemory.readbyte(base_address + 0x4a)
+        local firework = {}
+
+        firework.x = mainmemory.readbyte(base_address + 0x19)
+        firework.y = mainmemory.readbyte(base_address + 0x1d)
+        firework.index = firework_index
+        self.fireworks.list[ignition_index + 1] = firework
+      end
+
+      if self.fireworks.count == #self.fireworks.list then
+        -- calculate how much the pattern is optimal
+        local total_distance = 0
+        local disciple = { x = 192, y = 92 }
+        local firework_from = disciple
+        local firework_to = self.fireworks.list[1]
+        for ignition_index = 1, self.fireworks.count + 1 do
+          local distance = math.abs(firework_to.x - firework_from.x) + math.abs(firework_to.y - firework_from.y)
+          total_distance = total_distance + distance
+
+          firework_from = firework_to
+          if ignition_index < self.fireworks.count then
+            firework_to = self.fireworks.list[ignition_index + 1]
+          else
+            firework_to = disciple
+          end
+        end
+        self.fireworks.total_distance = total_distance
+      else
+        self.fireworks = nil
+      end
+    end
+  end
+
   self.impact = self.impact or {}
   self.impact.kills = mainmemory.read_u16_le(0x1ca6)
   self.impact.energy_gained = mainmemory.read_u16_le(0x1ca8)
@@ -296,8 +345,6 @@ function Goemon3SimpleHUD:fetch()
   else
     self.impact.cooldown_for_step = 0
   end
-
-  self.walker_jump = mainmemory.readbyte(0x042c)
 
   -- sound
   memory.usememorydomain("APURAM")
@@ -356,48 +403,50 @@ function Goemon3SimpleHUD:render_player_status()
       gui.text(hud_x, hud_y, status_message)
       hud_y = hud_y + font_height
 
-      for player_index = 0, self.MAX_PLAYERS - 1 do
-        status_message = string.format("%dP:", player_index + 1)
-        local player = self.players[player_index + 1]
+      if self.show_player_status then
+        for player_index = 0, self.MAX_PLAYERS - 1 do
+          status_message = string.format("%dP:", player_index + 1)
+          local player = self.players[player_index + 1]
 
-        status_message = status_message .. string.format(" P(%06X,%06X)", player.x, player.y)
-        status_message = status_message .. string.format(" V(%d,%d)", player.velocity_x, player.velocity_y)
+          status_message = status_message .. string.format(" P(%06X,%06X)", player.x, player.y)
+          status_message = status_message .. string.format(" V(%d,%d)", player.velocity_x, player.velocity_y)
 
-        gui.text(hud_x, hud_y, status_message)
-        hud_y = hud_y + font_height
+          gui.text(hud_x, hud_y, status_message)
+          hud_y = hud_y + font_height
 
-        status_message = "   "
-        status_message = status_message .. string.format(" R(%04X,%04X)", player.return_x_relative, player.return_y_relative)
-        if player.charge_for_dash ~= 0 then
-          status_message = status_message .. string.format(" D%d", player.charge_for_dash)
-        end
-        if player.charge_for_subweapon ~= 0 then
-          status_message = status_message .. string.format(" W%d", player.charge_for_subweapon)
-        end
-        if player.cooldown_for_invulnerability > 0 then
-          status_message = status_message .. string.format(" I%d", player.cooldown_for_invulnerability)
-        end
-        if player.cooldown_for_transformation ~= 0 then
-          status_message = status_message .. string.format(" T%d", player.cooldown_for_transformation)
-        end
-        if player.charge_for_jump ~= 0 then
-          status_message = status_message .. string.format(" J%d", player.charge_for_jump)
-        end
-        if player.cooldown_for_mermaid_rush ~= 0 then
-          status_message = status_message .. string.format(" M%d", player.cooldown_for_mermaid_rush)
-        end
-        if player.charge_for_falldown_x ~= 0 then
-          status_message = status_message .. string.format(" FX%d", player.charge_for_falldown_x)
-        end
-        if player.charge_for_falldown_y ~= 0 then
-          status_message = status_message .. string.format(" FY%d", player.charge_for_falldown_y)
-        end
-        if player.charge_for_pushing ~= 0 then
-          status_message = status_message .. string.format(" P%d", player.charge_for_pushing)
-        end
+          status_message = "   "
+          status_message = status_message .. string.format(" R(%04X,%04X)", player.return_x_relative, player.return_y_relative)
+          if player.charge_for_dash ~= 0 then
+            status_message = status_message .. string.format(" D%d", player.charge_for_dash)
+          end
+          if player.charge_for_subweapon ~= 0 then
+            status_message = status_message .. string.format(" W%d", player.charge_for_subweapon)
+          end
+          if player.cooldown_for_invulnerability > 0 then
+            status_message = status_message .. string.format(" I%d", player.cooldown_for_invulnerability)
+          end
+          if player.cooldown_for_transformation ~= 0 then
+            status_message = status_message .. string.format(" T%d", player.cooldown_for_transformation)
+          end
+          if player.charge_for_jump ~= 0 then
+            status_message = status_message .. string.format(" J%d", player.charge_for_jump)
+          end
+          if player.cooldown_for_mermaid_rush ~= 0 then
+            status_message = status_message .. string.format(" M%d", player.cooldown_for_mermaid_rush)
+          end
+          if player.charge_for_falldown_x ~= 0 then
+            status_message = status_message .. string.format(" FX%d", player.charge_for_falldown_x)
+          end
+          if player.charge_for_falldown_y ~= 0 then
+            status_message = status_message .. string.format(" FY%d", player.charge_for_falldown_y)
+          end
+          if player.charge_for_pushing ~= 0 then
+            status_message = status_message .. string.format(" P%d", player.charge_for_pushing)
+          end
 
-        gui.text(hud_x, hud_y, status_message)
-        hud_y = hud_y + font_height
+          gui.text(hud_x, hud_y, status_message)
+          hud_y = hud_y + font_height
+        end
       end
     elseif self.game_state == self.GAME_STATE_CHASE then
       local meter = self.meters_left
@@ -456,6 +505,21 @@ function Goemon3SimpleHUD:render_player_status()
         gui.text(hud_x * client.getwindowsize(), hud_y, status_message)
         hud_y = hud_y + font_height
       end
+    end
+  end
+
+  -- fireworks
+  if self.show_fireworks and self.fireworks then
+    for i, firework in ipairs(self.fireworks.list) do
+      local backcolor, forecolor
+
+      if (i - 1) ~= self.fireworks.ignited_count then
+        forecolor = gui.color(255, 255, 255, 128)
+      end
+
+      gui.text(firework.x * client.getwindowsize(),
+        firework.y * client.getwindowsize(),
+        string.format("%d", i), backcolor, forecolor)
     end
   end
 end
