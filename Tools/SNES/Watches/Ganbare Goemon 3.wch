@@ -1,0 +1,56 @@
+Domain WRAM
+SystemID SNES
+1C44	b	u	0	WRAM	Room transition cooldown
+197E	w	h	0	WRAM	Door glitch status
+0086	w	h	0	WRAM	Random number
+0440	w	s	0	WRAM	1P X speed (platform)
+0442	w	s	0	WRAM	1P Y speed (platform)
+0426	w	s	0	WRAM	1P X speed
+0428	w	s	0	WRAM	1P Y speed
+049C	b	u	0	WRAM	1P jump timer
+0464	b	h	0	WRAM	1P dash counter
+0468	b	h	0	WRAM	1P transform cooldown
+0452	b	h	0	WRAM	1P invulnerable
+042C	b	u	0	WRAM	1P mermaid dash timer
+044E	b	s	0	WRAM	1P subweapon charge
+0500	w	s	0	WRAM	2P X speed (platform)
+0502	w	s	0	WRAM	2P Y speed (platform)
+04E6	w	s	0	WRAM	2P X speed
+04E8	w	s	0	WRAM	2P Y speed
+055C	b	u	0	WRAM	2P jump timer
+0524	b	h	0	WRAM	2P dash counter
+0528	b	h	0	WRAM	2P transform cooldown
+0512	b	h	0	WRAM	2P invulnerable
+04EC	b	u	0	WRAM	2P mermaid dash timer
+050E	b	s	0	WRAM	2P subweapon charge
+0042	w	h	0	WRAM	RNG parameter #1
+1C38	w	h	0	WRAM	RNG parameter #2
+008E	w	h	0	WRAM	Room #
+00BA	b	u	0	WRAM	Life
+00BE	w	h	0	WRAM	Gold
+00E4	w	u	0	WRAM	Dialog flag
+0076	w	u	0	WRAM	Room transition flag
+1662	w	h	0	WRAM	Camera X (BG1 scroll X)
+1672	w	h	0	WRAM	Camera Y (BG1 scroll Y)
+0408	w	h	0	WRAM	1P X position
+040C	w	h	0	WRAM	1P Y position
+0410	w	h	0	WRAM	1P Z position
+042A	w	s	0	WRAM	1P Z speed
+0480	b	h	0	WRAM	1P return position X
+0482	b	h	0	WRAM	1P return position Y
+04BC	b	u	0	WRAM	1P falldown counter X
+04BD	b	u	0	WRAM	1P falldown counter Y
+0438	w	u	0	WRAM	1P invulnerable flag
+0444	w	s	0	WRAM	1P push counter
+04C8	w	h	0	WRAM	2P X position
+04CC	w	h	0	WRAM	2P Y position
+04D0	w	h	0	WRAM	2P Z position
+04EA	w	s	0	WRAM	2P Z speed
+0540	b	h	0	WRAM	2P return position X
+0542	b	h	0	WRAM	2P return position Y
+057C	b	h	0	WRAM	2P falldown counter X
+057D	b	h	0	WRAM	2P falldown counter Y
+04F8	w	u	0	WRAM	2P invulnerable flag
+0502	w	s	0	WRAM	2P push counter
+042C	b	s	0	WRAM	Karakuri Walker jump timer
+

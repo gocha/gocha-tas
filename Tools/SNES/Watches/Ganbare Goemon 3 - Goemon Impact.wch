@@ -1,0 +1,19 @@
+Domain WRAM
+SystemID SNES
+0086	w	h	0	WRAM	Random number
+1CA6	w	u	0	WRAM	Kills
+1CA8	w	u	0	WRAM	Energy Gained
+1CAA	w	u	0	WRAM	Gold gained /2
+1CAC	w	u	0	WRAM	Bomb gained *2
+1C40	w	h	0	WRAM	Koban charge
+1C44	w	h	0	WRAM	Punch charge
+1C48	w	h	0	WRAM	Impact HP
+0DD0	w	h	0	WRAM	Enemy HP
+1CD0	w	u	0	WRAM	Command timer
+1CC0	w	u	0	WRAM	Punch Rush counter
+1CC2	w	u	0	WRAM	Bomb Rush counter
+1CC4	w	u	0	WRAM	Guruguru Punch counter
+1CC6	w	u	0	WRAM	Super Upper counter
+1CC8	w	u	0	WRAM	Shield counter
+1CCA	w	u	0	WRAM	Laser counter
+

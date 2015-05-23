@@ -1,0 +1,22 @@
+Domain WRAM
+SystemID SNES
+0B44	w	h	0	WRAM	X position
+0B43	b	h	0	WRAM	X subpx position
+0B41	w	h	0	WRAM	Y yosition
+0B40	b	h	0	WRAM	Y subpx position
+0E10	b	u	0	WRAM	X speed
+0E11	b	u	0	WRAM	X speed count
+0E14	b	u	0	WRAM	Y speed
+0E15	b	u	0	WRAM	Y speed count
+0F1B	b	u	0	WRAM	Ability charge
+0B3E	b	u	0	WRAM	Ability remaining time
+0B4A	b	u	0	WRAM	Invincibility
+0E13	b	u	0	WRAM	Walljump help
+0E09	b	u	0	WRAM	Ingame time (seconds)
+0E08	b	u	0	WRAM	Ingame time (frames)
+0C65	b	u	0	WRAM	Conversation state
+1118	b	h	0	WRAM	Boss X position
+1115	b	h	0	WRAM	Boss Y position
+1110	b	u	0	WRAM	Boss HP
+1111	b	u	0	WRAM	Boss invincibility
+
