@@ -283,6 +283,7 @@ function Goemon3SimpleHUD:fetch()
   self.walker_jump = mainmemory.readbyte(0x042c)
 
   -- fireworks in Omatsurimura
+  self.fireworks = nil
   if self.room == 0x0170 then
     self.fireworks = {}
     self.fireworks.count = mainmemory.readbyte(0x0cae)
@@ -512,13 +513,18 @@ function Goemon3SimpleHUD:render_player_status()
   if self.show_fireworks and self.fireworks then
     for i, firework in ipairs(self.fireworks.list) do
       local backcolor, forecolor
+      local osc
 
-      if (i - 1) ~= self.fireworks.ignited_count then
+      if (i - 1) == self.fireworks.ignited_count then
+        forecolor = gui.color(255, 255, 255, 255)
+        osc = math.floor(0.5 + 1.618 * math.sin(((self.framecount % 60) / 30.0) * math.pi)) - 2
+      else
         forecolor = gui.color(255, 255, 255, 128)
+        osc = 0
       end
 
       gui.text(firework.x * client.getwindowsize(),
-        firework.y * client.getwindowsize(),
+        (firework.y + osc) * client.getwindowsize(),
         string.format("%d", i), backcolor, forecolor)
     end
   end
