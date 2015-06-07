@@ -83,10 +83,22 @@ Goemon3SimpleHUD.savestate_storage = {}
 -- Callback on save state
 function Goemon3SimpleHUD.onsavestate(savestate_id)
   local self = Goemon3SimpleHUD.instance()
-  local lua_savestate = { players = deep_copy(self.players) }
+  local lua_savestate = { players = deep_copy(self.players), RNGUpdatedTimes_Idle = self.RNGUpdatedTimes_Idle, RNGUpdatedTimesTotal_Idle = self.RNGUpdatedTimesTotal_Idle}
   self.savestate_storage[savestate_id] = lua_savestate
 end
 event.onsavestate(Goemon3SimpleHUD.onsavestate)
+
+-- Callback on RNG update (idle)
+function Goemon3SimpleHUD.OnRNGUpdateIdle()
+  local self = Goemon3SimpleHUD.instance()
+  self.RNGUpdatedTimes_Idle = self.RNGUpdatedTimes_Idle + 1
+end
+
+-- Callback on fireworks ordering
+function Goemon3SimpleHUD.OnFireworksOrder()
+  local self = Goemon3SimpleHUD.instance()
+  self.RNGOnFireworksOrder = mainmemory.read_u16_le(0x0086)
+end
 
 -- Callback on load state
 function Goemon3SimpleHUD.onloadstate(savestate_id)
@@ -97,11 +109,17 @@ function Goemon3SimpleHUD.onloadstate(savestate_id)
   self:fetch()
 
   if lua_savestate then
+    self.RNGUpdatedTimes_Idle = lua_savestate.RNGUpdatedTimes_Idle
+    self.RNGUpdatedTimesTotal_Idle = lua_savestate.RNGUpdatedTimesTotal_Idle
+
     for player_index = 0, 1 do
       local player = lua_savestate.players[player_index + 1]
       self.players[player_index + 1].velocity_x = player.velocity_x
       self.players[player_index + 1].velocity_y = player.velocity_y
     end
+  else
+    self.RNGUpdatedTimes_Idle = 0
+    self.RNGUpdatedTimesTotal_Idle = 0
   end
 
   -- Show the restored status
@@ -139,6 +157,12 @@ function Goemon3SimpleHUD.new()
   self.show_hitbox = true
   self.show_sound = true
   self.show_fireworks = true
+  self.rng_tracking = false -- slow
+
+  self.RNGUpdatedTimes_Idle = 0
+  self.RNGUpdatedTimesTotal_Idle = 0
+  self.RNGOnFireworksOrder = 0
+
   return self
 end
 
@@ -148,6 +172,16 @@ function Goemon3SimpleHUD.instance()
     Goemon3SimpleHUD.__instance = Goemon3SimpleHUD()
   end
   return Goemon3SimpleHUD.__instance
+end
+
+--- Reset variables on frame start.
+-- @param self Goemon3SimpleHUD object.
+function Goemon3SimpleHUD:onframestart()
+  self.RNGUpdatedTimes_Idle = 0
+  if self.rng_tracking then
+    event.onmemoryexecute(Goemon3SimpleHUD.OnRNGUpdateIdle, 0x8080F1, "Goemon3SimpleHUD.OnRNGUpdateIdle")
+    event.onmemoryexecute(Goemon3SimpleHUD.OnFireworksOrder, 0x8DB7B3, "Goemon3SimpleHUD.OnFireworksOrder")
+  end
 end
 
 --- Fetch game variables.
@@ -325,6 +359,12 @@ function Goemon3SimpleHUD:fetch()
         self.fireworks = nil
       end
     end
+  end
+
+  event.unregisterbyname("Goemon3SimpleHUD.OnRNGUpdateIdle")
+  event.unregisterbyname("Goemon3SimpleHUD.OnFireworksOrder")
+  if self.rng_tracking then
+    self.RNGUpdatedTimesTotal_Idle = self.RNGUpdatedTimesTotal_Idle + self.RNGUpdatedTimes_Idle
   end
 
   self.impact = self.impact or {}
@@ -528,6 +568,17 @@ function Goemon3SimpleHUD:render_player_status()
         string.format("%d", i), backcolor, forecolor)
     end
   end
+
+  -- RNG
+  if self.rng_tracking then
+    gui.text(0 * client.getwindowsize(),
+      188 * client.getwindowsize() - 32,
+      string.format("RNG:%04X FW:%04X", self.random, self.RNGOnFireworksOrder))
+
+    gui.text(0 * client.getwindowsize(),
+      188 * client.getwindowsize() - 16,
+      string.format("RNG UPD(IDLE):%d(%d/F)", self.RNGUpdatedTimesTotal_Idle, self.RNGUpdatedTimes_Idle))
+  end
 end
 
 --- Render game status to screen.
@@ -539,6 +590,11 @@ end
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 local hud = Goemon3SimpleHUD.instance()
+
+-- frame-based procedure
+event.onframestart(function()
+  hud:onframestart()
+end)
 
 -- frame-based procedure
 event.onframeend(function()
