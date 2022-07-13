@@ -195,6 +195,16 @@ function Goemon3SimpleHUD:fetch()
   self.platform_screen = (mainmemory.readbyte(0x00a4) ~= 0)
   self.fade_level = math.min(mainmemory.readbyte(0x1fa0) / 15.0, 1.0)
 
+  self.realtime = {}
+  self.realtime.frames = emu.framecount()
+  local realtime_seconds = self.realtime.frames / movie.getfps()
+  self.realtime.subseconds = realtime_seconds - math.floor(realtime_seconds)
+  self.realtime.seconds = math.floor(realtime_seconds) % 60
+  self.realtime.minutes = math.floor(realtime_seconds) / 60 % 60
+  self.realtime.hours = math.floor(math.floor(realtime_seconds) / 60 / 60)
+  self.realtime.readable = ((self.realtime.hours == 0) and "" or string.format("%d:", self.realtime.hours)) ..
+    string.format("%02d:%05.2f", self.realtime.minutes, self.realtime.seconds + self.realtime.subseconds)
+
   self.ingame = {}
   self.ingame.hours = bcd_to_number(memory.readbyte(0x08ef))
   self.ingame.minutes = bcd_to_number(memory.readbyte(0x08ee))
@@ -427,7 +437,7 @@ function Goemon3SimpleHUD:render_player_status()
   end
 
   -- messages
-  status_message = self.ingame.readable
+  status_message = "RTA:" .. self.realtime.readable
   if self.platform_screen then
     if self.game_state == self.GAME_STATE_OVERWORLD or self.game_state == self.GAME_STATE_PLATFORM then
       status_message = status_message .. string.format(" ROOM:%03X", self.room)
