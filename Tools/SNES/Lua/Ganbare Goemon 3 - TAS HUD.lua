@@ -197,7 +197,8 @@ function Goemon3SimpleHUD:fetch()
 
   self.realtime = {}
   self.realtime.frames = emu.framecount()
-  local realtime_seconds = self.realtime.frames / movie.getfps()
+  local fps = 21477272.0 / 357366.0
+  local realtime_seconds = self.realtime.frames / fps
   self.realtime.subseconds = realtime_seconds - math.floor(realtime_seconds)
   self.realtime.seconds = math.floor(realtime_seconds) % 60
   self.realtime.minutes = math.floor(realtime_seconds) / 60 % 60
