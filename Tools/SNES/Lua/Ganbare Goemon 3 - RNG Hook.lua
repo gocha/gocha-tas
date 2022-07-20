@@ -8,8 +8,8 @@ local readExcludePCs = {
   0x86C445, -- part of $86C43D, RNG update routine
   0x86C44A, -- part of $86C43D, RNG update routine
   -- 0x86C45B, -- ?
-  0x8BBFBB, -- boss frog smoke position before appearing
-  0x8BC200, -- condition for boss frog smoke after flaming
+  -- 0x8BBFBB, -- boss frog smoke position before appearing
+  -- 0x8BC200, -- condition for boss frog smoke after flaming
 }
 
 event.onmemoryread(function()
