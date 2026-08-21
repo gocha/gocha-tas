@@ -2,7 +2,7 @@
 -- For Snes9x rerecording 1.43/1.51
 
 -- User configuration
-local deduplicate = true
+local deduplicate = false
 
 local breakpoints = {
     { type = "exec",  addr = 0x83D22C, name = "damage" },
